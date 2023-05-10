@@ -13,6 +13,7 @@ const sleep = (timeout) => {
 };
 
 /**
+ * 获取查询抽卡记录的url，并删除其中的gacha_type,page,size,end_id参数
  * @returns {string|null} base url of gacha, null if not find
  */
 export function getGachaBaseUrl() {
@@ -69,8 +70,8 @@ class Param {
 }
 
 /**
- * get and save record of base url and param into json buffer and save to file in json path
- * @param {string}base_url base url of gacha
+ * 获取某页和之后的抽卡记录（如你所见，是个递归），并保存（怕获取失败前面的白跑了）
+ * @param {string}base_url
  * @param {Param}param
  * @param {json}json_buffer
  * @param {string}json_path
@@ -102,6 +103,11 @@ async function getAndSaveRecord(
   if (list.length < 20) return;
   await getAndSaveRecord(base_url, param, json_buffer, json_path, gacha_name);
 }
+
+/**
+ * 获取并保存所有抽卡记录
+ * @returns {Promise<void>}
+ */
 export async function saveAll() {
   const baseUrl = getGachaBaseUrl();
   if (baseUrl === null) {

@@ -1,24 +1,11 @@
-# star-rails-toolbox
+# 星穹铁道工具箱
 
-## Project setup
-```
-npm install
-```
+首次使用先打开一下设置页面，可能会卡一小会，看看游戏路径是否正常获取到
 
-### Compiles and hot-reloads for development
-```
-electron:serve": "SET NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service electron:serve
-```
+然后打开抽卡记录页面，点击获取抽卡记录。
 
-### Compiles and minifies for production
-```
-SET NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service electron:build
-```
+如果显示`用户信息过期`或者`无法获取查询网址`，就打开游戏先去查询一下抽卡记录（用过原神各类工具箱的应该轻车熟路了），然后再次回来获取。
 
-### Lints and fixes files
-```
-npm run lint
-```
+作者水平菜，抽卡记录直接以`json`文件的格式写入，~~永远不会~~将来将重构成写入sqlite保存。
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+其他功能

@@ -2,6 +2,10 @@ import { runSync } from "@/utils/cmd";
 const path = require("path");
 const fs = require("fs");
 
+/**
+ * 从注册表获取游戏登录器路径
+ * @returns {*|null}
+ */
 export function getLauncherPathFromRegister() {
   const command =
     "powershell Get-ItemPropertyValue Registry::HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\崩坏：星穹铁道 InstallPath";
@@ -9,6 +13,11 @@ export function getLauncherPathFromRegister() {
   if (ret === null) return null;
   return ret.trim();
 }
+
+/**
+ * 从登录器路径获取游戏路径
+ * @returns {string|null}
+ */
 export function getGamePathFromRegister() {
   const launcher_path = getLauncherPathFromRegister();
   if (launcher_path === null) return null;
