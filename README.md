@@ -7,12 +7,12 @@ npm install
 
 ### Compiles and hot-reloads for development
 ```
-npm run serve
+electron:serve": "SET NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service electron:serve
 ```
 
 ### Compiles and minifies for production
 ```
-npm run build
+SET NODE_OPTIONS=--openssl-legacy-provider && vue-cli-service electron:build
 ```
 
 ### Lints and fixes files
