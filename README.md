@@ -19,5 +19,3 @@
 * vue3
 * electron
 * element-plus
-
-

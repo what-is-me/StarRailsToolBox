@@ -77,7 +77,15 @@
                 v-for="role in recordset.data"
                 :key="role.name"
               >
-                {{ role.name }}[{{ role.num }}]
+                <el-text v-if="role.num <= 10" style="color: red">
+                  {{ role.name }}[{{ role.num }}]
+                </el-text>
+                <el-text v-else-if="role.num <= 80" style="color: orange">
+                  {{ role.name }}[{{ role.num }}]
+                </el-text>
+                <el-text v-else style="color: gray">
+                  {{ role.name }}[{{ role.num }}]
+                </el-text>
               </el-text>
             </el-text>
           </el-col>

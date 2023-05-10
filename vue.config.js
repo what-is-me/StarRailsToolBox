@@ -6,6 +6,7 @@ module.exports = defineConfig({
     electronBuilder: {
       nodeIntegration: true,
       builderOptions: {
+        publish: ["github"],
         nsis: {
           allowToChangeInstallationDirectory: true,
           oneClick: false,
