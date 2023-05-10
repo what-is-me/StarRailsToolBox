@@ -1,18 +1,19 @@
 import * as fs from "fs";
 import { getGamePathFromRegister } from "@/utils/register";
+import { PROGRAM_DATA_DIR, SETTING_PATH } from "@/utils/path_config";
 
 export class Setting {
   constructor() {
     this.game_path = "";
   }
 }
-const SETTING_PATH = "./setting.json";
 
 /**
  * 保存设置
  * @param setting
  */
 export function saveSetting(setting) {
+  fs.mkdirSync(PROGRAM_DATA_DIR, { recursive: true });
   return fs.writeFileSync(SETTING_PATH, JSON.stringify(setting), "utf-8");
 }
 

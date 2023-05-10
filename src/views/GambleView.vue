@@ -100,6 +100,7 @@ import { GachaTypes, saveAll } from "@/utils/gachautils";
 import { ElMessage } from "element-plus";
 import path from "path";
 import fs from "fs";
+import { ACCOUNT_DIR } from "@/utils/path_config";
 
 export default {
   name: "GambleView",
@@ -121,7 +122,7 @@ export default {
       });
     },
     findUids() {
-      const data_dir = path.join("data", "account");
+      const data_dir = ACCOUNT_DIR;
       try {
         fs.accessSync(data_dir);
         this.uids = fs.readdirSync(data_dir);
@@ -133,7 +134,7 @@ export default {
       this.gacha_data = [];
       this.findUids();
       console.log(this.uid);
-      const dir = path.join("data", "account", this.uid);
+      const dir = path.join(ACCOUNT_DIR, this.uid);
       for (const gacha_type of GachaTypes) {
         try {
           const json_path = path.join(

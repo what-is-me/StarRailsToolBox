@@ -3,6 +3,7 @@ import * as path from "path";
 import * as fs from "fs";
 import axios from "axios";
 import { ElMessage } from "element-plus";
+import { ACCOUNT_DIR } from "@/utils/path_config";
 const WEB_CACHE_PATH = "StarRail_Data\\webCaches\\Cache\\Cache_Data\\data_2";
 const sleep = (timeout) => {
   return new Promise((resolve) => {
@@ -126,7 +127,7 @@ export async function saveAll() {
       continue;
     }
     const uid = list[0].uid.toString();
-    const dir_path = path.join("data", "account", uid);
+    const dir_path = path.join(ACCOUNT_DIR, uid);
     fs.mkdirSync(dir_path, { recursive: true });
     let json_buffer = {};
     const json_path = path.join(dir_path, code.toString() + ".json");
