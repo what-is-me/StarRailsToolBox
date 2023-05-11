@@ -10,7 +10,8 @@
     "electron:serve": "vue-cli-service electron:serve",
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps",
-    "publish": "vue-cli-service electron:build --win --x64 -p always"
+    "publish": "vue-cli-service electron:build --win --x64 -p always",
+    "lint-fix":"eslint --fix --ext .js,.vue src"
   },
   "main": "background.js",
   "dependencies": {

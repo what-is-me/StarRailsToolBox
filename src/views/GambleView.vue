@@ -69,7 +69,7 @@
               }}%]
             </el-text>
           </el-col>
-          <el-col :span="12">
+          <el-col :span="14">
             <el-text>
               <strong>五星记录：</strong>
               <el-text
@@ -89,7 +89,7 @@
               </el-text>
             </el-text>
           </el-col>
-          <el-col :span="4">
+          <el-col :span="2">
             <el-button
               :icon="More"
               circle
@@ -104,16 +104,22 @@
     v-model="tableVisible"
     :title="tableTitle"
     direction="rtl"
-    size="50%"
+    size="45%"
   >
     <el-table
       :data="records"
       style="width: 100%"
       :default-sort="{ prop: 'index', order: 'descending' }"
     >
-      <el-table-column type="index" :index="index" width="100" sortable />
-      <el-table-column prop="time" label="时间" width="180" />
-      <el-table-column label="名称" width="180">
+      <el-table-column
+        type="index"
+        :index="index + 1"
+        label="No."
+        width="100"
+        sortable
+      />
+      <el-table-column prop="time" align="center" label="时间" width="180" />
+      <el-table-column label="名称" align="center" width="200">
         <template #default="scope">
           <el-text v-if="scope.row.rank_type === '5'" style="color: orange">
             {{ scope.row.name }}
@@ -151,6 +157,7 @@ export default {
   },
   data() {
     return {
+      index: 0,
       tableTitle: "",
       tableVisible: false,
       uid: "",
