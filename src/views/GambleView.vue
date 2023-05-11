@@ -1,4 +1,5 @@
 <template>
+  <!--页头-->
   <el-header>
     <el-row>
       <el-col :span="8">
@@ -25,6 +26,7 @@
   </el-header>
   <el-main>
     <div v-if="gacha_data.length > 0">
+      <!--四种跃迁-->
       <el-card v-for="recordset in gacha_data" :key="recordset.name">
         <template #header>
           <div>
@@ -98,8 +100,44 @@
           </el-col>
         </el-row>
       </el-card>
+      <!--角色和光锥一览-->
+      <el-card>
+        <template #header>
+          <div class="card-header">
+            <span>角色一览</span>
+          </div>
+        </template>
+        <el-space wrap size="large">
+          <el-badge
+            v-for="({ icon, num }, id) in characters"
+            :key="id"
+            :value="num"
+            type="info"
+          >
+            <el-avatar :src="icon" shape="square" size="large" />
+          </el-badge>
+        </el-space>
+      </el-card>
+      <el-card>
+        <template #header>
+          <div class="card-header">
+            <span>光锥一览</span>
+          </div>
+        </template>
+        <el-space wrap size="large">
+          <el-badge
+            v-for="({ icon, num }, id) in lightcones"
+            :key="id"
+            :value="num"
+            type="info"
+          >
+            <el-avatar :src="icon" shape="square" size="large" />
+          </el-badge>
+        </el-space>
+      </el-card>
     </div>
   </el-main>
+  <!--详细表格-->
   <el-drawer
     v-model="tableVisible"
     :title="tableTitle"
@@ -147,6 +185,7 @@ import path from "path";
 import fs from "fs";
 import { ACCOUNT_DIR } from "@/utils/path_config";
 import { More } from "@element-plus/icons-vue";
+import { itemPic, updateWiki } from "@/utils/GameData";
 
 export default {
   name: "GambleView",
@@ -164,10 +203,14 @@ export default {
       uids: [],
       gacha_data: [],
       records: [],
+      characters: [],
+      lightcones: [],
     };
   },
   created() {
-    this.showAll();
+    updateWiki().then(() => {
+      this.showAll();
+    });
   },
   methods: {
     showTable(tableTitle, records) {
@@ -191,11 +234,17 @@ export default {
         // eslint-disable-next-line no-empty
       } catch (e) {}
     },
+    /**
+     * 正在变成屎山
+     */
     showAll() {
       this.gacha_data = [];
       this.findUids();
       //console.log(this.uid);
       const dir = path.join(ACCOUNT_DIR, this.uid);
+      const characters = [];
+      const lightcones = [];
+      const rank_map = [];
       for (const gacha_type of GachaTypes) {
         try {
           const json_path = path.join(
@@ -215,7 +264,9 @@ export default {
           statistic["5s"] = 0;
           statistic["all"] = 0;
           let tmp = 0;
+
           for (const record of records) {
+            rank_map[record.name] = Number(record.rank_type);
             tmp++;
             statistic[record.rank_type + "s"]++;
             statistic["all"]++;
@@ -225,6 +276,18 @@ export default {
                 name: record.name,
               });
               tmp = 0;
+            }
+            if (record["item_type"] === "光锥") {
+              lightcones[record.name] =
+                lightcones[record.name] === undefined
+                  ? 1
+                  : lightcones[record.name] + 1;
+            }
+            if (record["item_type"] === "角色") {
+              characters[record.name] =
+                characters[record.name] === undefined
+                  ? 1
+                  : characters[record.name] + 1;
             }
           }
           gdata["bd"] = tmp;
@@ -238,6 +301,29 @@ export default {
           console.error(e);
         }
       }
+      this.characters = [];
+      for (const name in characters) {
+        //console.log(name, itemPic("角色", name));
+        this.characters.push({
+          icon: itemPic("角色", name),
+          num: characters[name],
+          rank: rank_map[name],
+        });
+      }
+      this.characters.sort((a, b) => {
+        return b.rank - a.rank;
+      });
+      this.lightcones = [];
+      for (const name in lightcones) {
+        this.lightcones.push({
+          icon: itemPic("光锥", name),
+          num: lightcones[name],
+          rank: rank_map[name],
+        });
+      }
+      this.lightcones.sort((a, b) => {
+        return b.rank - a.rank;
+      });
     },
   },
 };
