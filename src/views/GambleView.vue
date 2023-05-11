@@ -32,16 +32,16 @@
           </div>
         </template>
         <el-row>
-          <el-col :span="7">
+          <el-col :span="4">
             <el-text>
               <strong>总数：</strong>{{ recordset.statistic["all"] }}
             </el-text>
             <br />
             <el-text>
-              <strong>保底内：</strong> {{ recordset.data["bd"] }}
+              <strong>保底内：</strong> {{ recordset.roles["bd"] }}
             </el-text>
           </el-col>
-          <el-col :span="7">
+          <el-col :span="4">
             <el-text style="color: orange">
               <strong>五星：</strong>{{ recordset.statistic["5s"] }}[{{
                 (
@@ -69,12 +69,12 @@
               }}%]
             </el-text>
           </el-col>
-          <el-col :span="10">
+          <el-col :span="12">
             <el-text>
               <strong>五星记录：</strong>
               <el-text
                 style="color: orange"
-                v-for="role in recordset.data"
+                v-for="role in recordset.roles"
                 :key="role.name"
               >
                 <el-text v-if="role.num <= 10" style="color: red">
@@ -89,10 +89,49 @@
               </el-text>
             </el-text>
           </el-col>
+          <el-col :span="4">
+            <el-button
+              :icon="More"
+              circle
+              @click="showTable(recordset.name, recordset.data)"
+            />
+          </el-col>
         </el-row>
       </el-card>
     </div>
   </el-main>
+  <el-drawer
+    v-model="tableVisible"
+    :title="tableTitle"
+    direction="rtl"
+    size="50%"
+  >
+    <el-table
+      :data="records"
+      style="width: 100%"
+      :default-sort="{ prop: 'index', order: 'descending' }"
+    >
+      <el-table-column type="index" :index="index" width="100" sortable />
+      <el-table-column prop="time" label="时间" width="180" />
+      <el-table-column label="名称" width="180">
+        <template #default="scope">
+          <el-text v-if="scope.row.rank_type === '5'" style="color: orange">
+            {{ scope.row.name }}
+          </el-text>
+          <el-text
+            v-else-if="scope.row.rank_type === '4'"
+            style="color: darkviolet"
+          >
+            {{ scope.row.name }}
+          </el-text>
+          <el-text v-else type="primary">
+            {{ scope.row.name }}
+          </el-text>
+        </template>
+      </el-table-column>
+      <el-table-column prop="item_type" label="种类" width="80" />
+    </el-table>
+  </el-drawer>
 </template>
 
 <script>
@@ -101,20 +140,35 @@ import { ElMessage } from "element-plus";
 import path from "path";
 import fs from "fs";
 import { ACCOUNT_DIR } from "@/utils/path_config";
+import { More } from "@element-plus/icons-vue";
 
 export default {
   name: "GambleView",
+  computed: {
+    More() {
+      return More;
+    },
+  },
   data() {
     return {
+      tableTitle: "",
+      tableVisible: false,
       uid: "",
       uids: [],
       gacha_data: [],
+      records: [],
     };
   },
   created() {
     this.showAll();
   },
   methods: {
+    showTable(tableTitle, records) {
+      this.tableTitle = tableTitle;
+      this.records = records;
+      this.tableVisible = true;
+      //console.log(this.records);
+    },
     saveAll() {
       saveAll().then(() => {
         ElMessage({ message: "成功获取所有信息", type: "success" });
@@ -133,7 +187,7 @@ export default {
     showAll() {
       this.gacha_data = [];
       this.findUids();
-      console.log(this.uid);
+      //console.log(this.uid);
       const dir = path.join(ACCOUNT_DIR, this.uid);
       for (const gacha_type of GachaTypes) {
         try {
@@ -169,8 +223,9 @@ export default {
           gdata["bd"] = tmp;
           this.gacha_data.push({
             name: gacha_type.name_ch,
-            data: gdata,
+            roles: gdata,
             statistic: statistic,
+            data: records,
           });
         } catch (e) {
           console.error(e);
