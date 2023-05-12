@@ -255,7 +255,7 @@ export default {
         datasets: [
           {
             backgroundColor: ["#409EFF", "#9400D3FF", "#FFA500FF"],
-            data: [1, 1, 1],
+            data: [0, 0, 0],
           },
         ],
       },
@@ -303,6 +303,7 @@ export default {
      */
     showAll() {
       this.total = 0;
+      this.chartData.datasets[0].data = [0, 0, 0];
       this.gacha_data = [];
       this.findUids();
       //console.log(this.uid);
