@@ -100,6 +100,54 @@
           </el-col>
         </el-row>
       </el-card>
+      <!--统计-->
+      <el-card>
+        <el-row>
+          <el-col :span="18">
+            <el-row>
+              <el-col :span="12">
+                <el-statistic title="总计抽数" :value="total" />
+              </el-col>
+              <el-col :span="12">
+                <el-statistic
+                  title="五星出率"
+                  :value="(chartData.datasets[0].data[2] / total) * 100"
+                  :precision="2"
+                  suffix="%"
+                />
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="12">
+                <el-statistic
+                  title="四星出率"
+                  :value="(chartData.datasets[0].data[1] / total) * 100"
+                  :precision="2"
+                  suffix="%"
+                />
+              </el-col>
+              <el-col :span="12">
+                <el-statistic
+                  title="三星出率"
+                  :value="(chartData.datasets[0].data[0] / total) * 100"
+                  :precision="2"
+                  suffix="%"
+                />
+              </el-col>
+            </el-row>
+          </el-col>
+          <el-col :span="4">
+            <Pie
+              style="height: 200px"
+              :data="chartData"
+              :options="{
+                responsive: true,
+                maintainAspectRatio: false,
+              }"
+            />
+          </el-col>
+        </el-row>
+      </el-card>
       <!--角色和光锥一览-->
       <el-card>
         <template #header>
@@ -186,9 +234,15 @@ import fs from "fs";
 import { ACCOUNT_DIR } from "@/utils/path_config";
 import { More } from "@element-plus/icons-vue";
 import { itemPic, updateWiki } from "@/utils/GameData";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { Pie } from "vue-chartjs";
 
+ChartJS.register(ArcElement, Tooltip, Legend);
 export default {
   name: "GambleView",
+  components: {
+    Pie,
+  },
   computed: {
     More() {
       return More;
@@ -196,6 +250,16 @@ export default {
   },
   data() {
     return {
+      chartData: {
+        labels: ["三星", "四星", "五星"],
+        datasets: [
+          {
+            backgroundColor: ["#409EFF", "#9400D3FF", "#FFA500FF"],
+            data: [1, 1, 1],
+          },
+        ],
+      },
+      total: 0,
       index: 0,
       tableTitle: "",
       tableVisible: false,
@@ -235,9 +299,10 @@ export default {
       } catch (e) {}
     },
     /**
-     * 正在变成屎山
+     * 正在变成屎山QAQ
      */
     showAll() {
+      this.total = 0;
       this.gacha_data = [];
       this.findUids();
       //console.log(this.uid);
@@ -270,6 +335,8 @@ export default {
             tmp++;
             statistic[record.rank_type + "s"]++;
             statistic["all"]++;
+            this.chartData.datasets[0].data[Number(record.rank_type) - 3]++;
+            this.total++;
             if (record.rank_type === "5") {
               gdata.push({
                 num: tmp,
@@ -329,4 +396,9 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.el-statistic {
+  margin: 16px 8px;
+  text-align: center;
+}
+</style>

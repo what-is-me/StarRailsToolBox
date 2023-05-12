@@ -18,7 +18,23 @@
   </el-container>
 </template>
 
-<style></style>
+<style scoped>
+.el-aside {
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 60px;
+  bottom: 0;
+}
+.el-main {
+  position: absolute;
+  left: 300px;
+  right: 0;
+  top: 60px;
+  bottom: 0;
+  overflow-y: scroll;
+}
+</style>
 <script>
 import { routes } from "@/router";
 

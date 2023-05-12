@@ -17,7 +17,8 @@
 ## 来点界面截图
 ### 抽卡记录页面
 ![img.png](image/img.png)
-### 角色和光锥一览（v0.1.3）
+### 角色和光锥一览和统计图（v0.1.3）
+![img.png](image/img2.png)
 ![img.png](image/img3.png)
 ### 抽卡的详细记录（点击每种跃迁卡片右边的...按钮）（v0.1.2）
 ![img_1.png](image/img_1.png)
