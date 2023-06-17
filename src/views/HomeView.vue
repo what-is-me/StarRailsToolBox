@@ -1,11 +1,13 @@
-<template>
-  <div class="home">
-    <el-header>这是一个星穹铁道工具箱</el-header>
-  </div>
-</template>
+<template><div></div></template>
 
 <script>
 export default {
   name: "HomeView",
 };
 </script>
+<style>
+.main {
+  height: 100%;
+  width: 100%;
+}
+</style>

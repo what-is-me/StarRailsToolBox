@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import { getGamePathFromRegister } from "@/utils/register";
 import { PROGRAM_DATA_DIR, SETTING_PATH } from "@/utils/path_config";
+import { getGachaUrl } from "@/utils/gachautils";
 
 export class Setting {
   constructor() {
@@ -24,6 +25,7 @@ export function saveSetting(setting) {
 export function initSetting() {
   const setting = new Setting();
   setting.game_path = getGamePathFromRegister();
+  setting.gacha_url = getGachaUrl();
   return setting;
 }
 

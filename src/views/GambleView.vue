@@ -27,162 +27,103 @@
   <el-main>
     <div v-if="gacha_data.length > 0">
       <!--四种跃迁-->
-      <el-card v-for="recordset in gacha_data" :key="recordset.name">
-        <template #header>
-          <div>
-            <span>{{ recordset.name }}</span>
-          </div>
-        </template>
-        <el-row>
-          <el-col :span="4">
-            <el-text>
-              <strong>总数：</strong>{{ recordset.statistic["all"] }}
-            </el-text>
-            <br />
-            <el-text>
-              <strong>保底内：</strong> {{ recordset.roles["bd"] }}
-            </el-text>
-          </el-col>
-          <el-col :span="4">
-            <el-text style="color: orange">
-              <strong>五星：</strong>{{ recordset.statistic["5s"] }}[{{
-                (
-                  (recordset.statistic["5s"] / recordset.statistic["all"]) *
-                  100
-                ).toFixed(2)
-              }}%]
-            </el-text>
-            <br />
-            <el-text style="color: darkviolet">
-              <strong>四星：</strong>{{ recordset.statistic["4s"] }}[{{
-                (
-                  (recordset.statistic["4s"] / recordset.statistic["all"]) *
-                  100
-                ).toFixed(2)
-              }}%]
-            </el-text>
-            <br />
-            <el-text type="primary">
-              <strong>三星：</strong>{{ recordset.statistic["3s"] }}[{{
-                (
-                  (recordset.statistic["3s"] / recordset.statistic["all"]) *
-                  100
-                ).toFixed(2)
-              }}%]
-            </el-text>
-          </el-col>
-          <el-col :span="14">
-            <el-text>
-              <strong>五星记录：</strong>
-              <el-text
-                style="color: orange"
-                v-for="role in recordset.roles"
-                :key="role.name"
-              >
-                <el-text v-if="role.num <= 10" style="color: red">
-                  {{ role.name }}[{{ role.num }}]
-                </el-text>
-                <el-text v-else-if="role.num <= 80" style="color: orange">
-                  {{ role.name }}[{{ role.num }}]
-                </el-text>
-                <el-text v-else style="color: gray">
-                  {{ role.name }}[{{ role.num }}]
-                </el-text>
+      <el-tabs type="border-card">
+        <el-tab-pane
+          v-for="recordset in gacha_data"
+          :key="recordset.name"
+          :label="recordset.name"
+        >
+          <el-row>
+            <el-col :span="8">
+              <el-text>
+                <strong>总数：</strong>&ensp;&ensp;{{
+                  recordset.statistic["all"]
+                }}
               </el-text>
-            </el-text>
-          </el-col>
-          <el-col :span="2">
-            <el-button
-              :icon="More"
-              circle
-              @click="showTable(recordset.name, recordset.data)"
-            />
-          </el-col>
-        </el-row>
-      </el-card>
-      <!--统计-->
-      <el-card>
-        <el-row>
-          <el-col :span="18">
-            <el-row>
-              <el-col :span="12">
-                <el-statistic title="总计抽数" :value="total" />
-              </el-col>
-              <el-col :span="12">
-                <el-statistic
-                  title="五星出率"
-                  :value="(chartData.datasets[0].data[2] / total) * 100"
-                  :precision="2"
-                  suffix="%"
+              <br />
+              <el-text>
+                <strong>保底内：</strong> {{ recordset.roles["bd"] }}发
+              </el-text>
+              <br />
+              <el-text style="color: orange">
+                <strong>五星：</strong>&ensp;&ensp;{{
+                  recordset.statistic["5s"]
+                }}[{{
+                  (
+                    (recordset.statistic["5s"] / recordset.statistic["all"]) *
+                    100
+                  ).toFixed(2)
+                }}%]
+              </el-text>
+              <br />
+              <el-text style="color: darkviolet">
+                <strong>四星：</strong>&ensp;&ensp;{{
+                  recordset.statistic["4s"]
+                }}[{{
+                  (
+                    (recordset.statistic["4s"] / recordset.statistic["all"]) *
+                    100
+                  ).toFixed(2)
+                }}%]
+              </el-text>
+              <br />
+              <el-text type="primary">
+                <strong>三星：</strong>&ensp;&ensp;{{
+                  recordset.statistic["3s"]
+                }}[{{
+                  (
+                    (recordset.statistic["3s"] / recordset.statistic["all"]) *
+                    100
+                  ).toFixed(2)
+                }}%]
+              </el-text>
+              <br />
+              <br />
+              <el-link @click="showTable(recordset.name, recordset.data)">
+                抽卡详情
+              </el-link>
+            </el-col>
+            <el-col :span="16">
+              <el-scrollbar max-height="300px">
+                <golden-card-large
+                  v-for="role in recordset.roles"
+                  :key="role.name"
+                  :type="role.type"
+                  :name="role.name"
+                  :num="role.num"
                 />
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col :span="12">
-                <el-statistic
-                  title="四星出率"
-                  :value="(chartData.datasets[0].data[1] / total) * 100"
-                  :precision="2"
-                  suffix="%"
-                />
-              </el-col>
-              <el-col :span="12">
-                <el-statistic
-                  title="三星出率"
-                  :value="(chartData.datasets[0].data[0] / total) * 100"
-                  :precision="2"
-                  suffix="%"
-                />
-              </el-col>
-            </el-row>
-          </el-col>
-          <el-col :span="4">
-            <Pie
-              style="height: 200px"
-              :data="chartData"
-              :options="{
-                responsive: true,
-                maintainAspectRatio: false,
-              }"
-            />
-          </el-col>
-        </el-row>
-      </el-card>
+              </el-scrollbar>
+            </el-col>
+          </el-row>
+        </el-tab-pane>
+      </el-tabs>
       <!--角色和光锥一览-->
-      <el-card>
-        <template #header>
-          <div class="card-header">
-            <span>角色一览</span>
-          </div>
-        </template>
-        <el-space wrap size="large">
-          <el-badge
-            v-for="({ icon, num }, id) in characters"
-            :key="id"
-            :value="num"
-            type="info"
-          >
-            <el-avatar :src="icon" shape="square" size="large" />
-          </el-badge>
-        </el-space>
-      </el-card>
-      <el-card>
-        <template #header>
-          <div class="card-header">
-            <span>光锥一览</span>
-          </div>
-        </template>
-        <el-space wrap size="large">
-          <el-badge
-            v-for="({ icon, num }, id) in lightcones"
-            :key="id"
-            :value="num"
-            type="info"
-          >
-            <el-avatar :src="icon" shape="square" size="large" />
-          </el-badge>
-        </el-space>
-      </el-card>
+      <el-tabs type="border-card">
+        <el-tab-pane label="角色总览">
+          <el-space wrap size="large">
+            <golden-card
+              v-for="({ name, num }, id) in characters"
+              :key="id"
+              :num="num"
+              type="角色"
+              :name="name"
+              size="large"
+            />
+          </el-space>
+        </el-tab-pane>
+        <el-tab-pane label="光锥总览">
+          <el-space wrap size="large">
+            <golden-card
+              v-for="({ name, num }, id) in lightcones"
+              :key="id"
+              :num="num"
+              type="光锥"
+              :name="name"
+              size="large"
+            />
+          </el-space>
+        </el-tab-pane>
+      </el-tabs>
     </div>
   </el-main>
   <!--详细表格-->
@@ -199,7 +140,7 @@
     >
       <el-table-column
         type="index"
-        :index="index + 1"
+        :index="1"
         label="No."
         width="100"
         sortable
@@ -233,16 +174,15 @@ import path from "path";
 import fs from "fs";
 import { ACCOUNT_DIR } from "@/utils/path_config";
 import { More } from "@element-plus/icons-vue";
-import { itemPic, updateWiki } from "@/utils/GameData";
+import { updateWiki } from "@/utils/wiki";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-import { Pie } from "vue-chartjs";
+import GoldenCard from "@/components/GoldenCard.vue";
+import GoldenCardLarge from "@/components/GoldenCardLarge.vue";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 export default {
   name: "GambleView",
-  components: {
-    Pie,
-  },
+  components: { GoldenCardLarge, GoldenCard },
   computed: {
     More() {
       return More;
@@ -250,17 +190,6 @@ export default {
   },
   data() {
     return {
-      chartData: {
-        labels: ["三星", "四星", "五星"],
-        datasets: [
-          {
-            backgroundColor: ["#409EFF", "#9400D3FF", "#FFA500FF"],
-            data: [0, 0, 0],
-          },
-        ],
-      },
-      total: 0,
-      index: 0,
       tableTitle: "",
       tableVisible: false,
       uid: "",
@@ -281,7 +210,6 @@ export default {
       this.tableTitle = tableTitle;
       this.records = records;
       this.tableVisible = true;
-      //console.log(this.records);
     },
     saveAll() {
       saveAll().then(() => {
@@ -302,11 +230,8 @@ export default {
      * 正在变成屎山QAQ
      */
     showAll() {
-      this.total = 0;
-      this.chartData.datasets[0].data = [0, 0, 0];
       this.gacha_data = [];
       this.findUids();
-      //console.log(this.uid);
       const dir = path.join(ACCOUNT_DIR, this.uid);
       const characters = [];
       const lightcones = [];
@@ -330,18 +255,16 @@ export default {
           statistic["5s"] = 0;
           statistic["all"] = 0;
           let tmp = 0;
-
           for (const record of records) {
             rank_map[record.name] = Number(record.rank_type);
             tmp++;
             statistic[record.rank_type + "s"]++;
             statistic["all"]++;
-            this.chartData.datasets[0].data[Number(record.rank_type) - 3]++;
-            this.total++;
             if (record.rank_type === "5") {
               gdata.push({
                 num: tmp,
                 name: record.name,
+                type: record.item_type,
               });
               tmp = 0;
             }
@@ -361,7 +284,7 @@ export default {
           gdata["bd"] = tmp;
           this.gacha_data.push({
             name: gacha_type.name_ch,
-            roles: gdata,
+            roles: gdata.reverse(),
             statistic: statistic,
             data: records,
           });
@@ -373,7 +296,7 @@ export default {
       for (const name in characters) {
         //console.log(name, itemPic("角色", name));
         this.characters.push({
-          icon: itemPic("角色", name),
+          name: name,
           num: characters[name],
           rank: rank_map[name],
         });
@@ -384,7 +307,7 @@ export default {
       this.lightcones = [];
       for (const name in lightcones) {
         this.lightcones.push({
-          icon: itemPic("光锥", name),
+          name: name,
           num: lightcones[name],
           rank: rank_map[name],
         });

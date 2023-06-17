@@ -1,9 +1,10 @@
-import { loadSetting } from "@/utils/settingutils";
+import { loadSetting, saveSetting } from "@/utils/settingutils";
 import * as path from "path";
 import * as fs from "fs";
 import axios from "axios";
 import { ElMessage } from "element-plus";
 import { ACCOUNT_DIR } from "@/utils/path_config";
+
 const WEB_CACHE_PATH = "StarRail_Data\\webCaches\\Cache\\Cache_Data\\data_2";
 const sleep = (timeout) => {
   return new Promise((resolve) => {
@@ -14,10 +15,23 @@ const sleep = (timeout) => {
 };
 
 /**
+ * 清理部分param
+ * @param {string}gachaUrl
+ * @returns {string}
+ */
+export function cleanGacha(gachaUrl) {
+  gachaUrl = gachaUrl.replaceAll(/&gacha_type=\d+/g, "");
+  gachaUrl = gachaUrl.replaceAll(/&page=\d+/g, "");
+  gachaUrl = gachaUrl.replaceAll(/&size=\d+/g, "");
+  gachaUrl = gachaUrl.replaceAll(/&end_id=\d+/g, "");
+  return gachaUrl;
+}
+
+/**
  * 获取查询抽卡记录的url，并删除其中的gacha_type,page,size,end_id参数
  * @returns {string|null} base url of gacha, null if not find
  */
-export function getGachaBaseUrl() {
+export function getGachaUrl() {
   const game_path = loadSetting().game_path;
   const web_cache_path = path.join(game_path, WEB_CACHE_PATH);
   try {
@@ -27,26 +41,13 @@ export function getGachaBaseUrl() {
     //console.log(gachaUrls);
     if (gachaUrls.length === 0) return null;
     let gachaUrl = gachaUrls[gachaUrls.length - 1][0];
-    gachaUrl = gachaUrl.replaceAll(/&gacha_type=\d+/g, "");
-    gachaUrl = gachaUrl.replaceAll(/&page=\d+/g, "");
-    gachaUrl = gachaUrl.replaceAll(/&size=\d+/g, "");
-    gachaUrl = gachaUrl.replaceAll(/&end_id=\d+/g, "");
     return gachaUrl;
   } catch (err) {
     return null;
   }
 }
+
 export const GachaTypes = [
-  {
-    name_ch: "群星跃迁",
-    name: "StellarWarp",
-    code: 1,
-  },
-  {
-    name_ch: "始发跃迁",
-    name: "DepartureWarp",
-    code: 2,
-  },
   {
     name_ch: "角色跃迁",
     name: "CharacterEventWarp",
@@ -57,7 +58,18 @@ export const GachaTypes = [
     name: "LightConeEventWarp",
     code: 12,
   },
+  {
+    name_ch: "群星跃迁",
+    name: "StellarWarp",
+    code: 1,
+  },
+  {
+    name_ch: "始发跃迁",
+    name: "DepartureWarp",
+    code: 2,
+  },
 ];
+
 class Param {
   constructor(gacha_type) {
     this.gacha_type = gacha_type === null ? 1 : gacha_type;
@@ -65,6 +77,7 @@ class Param {
     this._size = 20;
     this.end_id = 0;
   }
+
   toString() {
     return `&gacha_type=${this.gacha_type}&page=${this._page}&size=${this._size}&end_id=${this.end_id}`;
   }
@@ -110,7 +123,18 @@ async function getAndSaveRecord(
  * @returns {Promise<void>}
  */
 export async function saveAll() {
-  const baseUrl = getGachaBaseUrl();
+  const setting = loadSetting();
+  let baseUrl = cleanGacha(setting.gacha_url);
+  try {
+    const { data } = await axios.get(baseUrl + new Param(1).toString());
+    if (data == null) throw "?";
+  } catch (e) {
+    baseUrl = getGachaUrl();
+    setting.gacha_url = baseUrl;
+    baseUrl = cleanGacha(baseUrl);
+    saveSetting(setting);
+  }
+
   if (baseUrl === null) {
     ElMessage.error("无法获取查询网址");
     return;
