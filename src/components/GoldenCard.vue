@@ -22,11 +22,10 @@ export default {
     type: String,
     size: String,
   },
-  data() {
-    return { icon: "" };
-  },
-  created() {
-    this.icon = itemPic(this.type, this.name);
+  computed: {
+    icon() {
+      return itemPic(this.type, this.name);
+    },
   },
 };
 </script>

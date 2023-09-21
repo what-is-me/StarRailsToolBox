@@ -87,7 +87,7 @@
               <el-scrollbar max-height="300px">
                 <golden-card-large
                   v-for="role in recordset.roles"
-                  :key="role.name"
+                  :key="role.id"
                   :type="role.type"
                   :name="role.name"
                   :num="role.num"
@@ -102,7 +102,7 @@
         <el-tab-pane label="角色总览">
           <el-space wrap size="large">
             <golden-card
-              v-for="({ name, num }, id) in characters"
+              v-for="{ name, num, id } in characters"
               :key="id"
               :num="num"
               type="角色"
@@ -114,7 +114,7 @@
         <el-tab-pane label="光锥总览">
           <el-space wrap size="large">
             <golden-card
-              v-for="({ name, num }, id) in lightcones"
+              v-for="{ name, num, id } in lightcones"
               :key="id"
               :num="num"
               type="光锥"
@@ -228,7 +228,7 @@ export default {
      * 正在变成屎山QAQ
      */
     showAll() {
-      this.gacha_data = [];
+      const gacha_data = [];
       this.findUids();
       const dir = path.join(ACCOUNT_DIR, this.uid);
       const characters = [];
@@ -263,6 +263,7 @@ export default {
                 num: tmp,
                 name: record.name,
                 type: record.item_type,
+                id: record.id,
               });
               tmp = 0;
             }
@@ -280,7 +281,7 @@ export default {
             }
           }
           gdata["bd"] = tmp;
-          this.gacha_data.push({
+          gacha_data.push({
             name: gacha_type.name_ch,
             roles: gdata.reverse(),
             statistic: statistic,
@@ -290,29 +291,40 @@ export default {
           console.error(e);
         }
       }
-      this.characters = [];
+      this.gacha_data = gacha_data;
+      const temp_characters = [];
       for (const name in characters) {
         //console.log(name, itemPic("角色", name));
-        this.characters.push({
+        temp_characters.push({
           name: name,
           num: characters[name],
           rank: rank_map[name],
+          id: 0,
         });
       }
-      this.characters.sort((a, b) => {
+      temp_characters.sort((a, b) => {
         return b.rank - a.rank;
       });
-      this.lightcones = [];
+      for (const i in temp_characters) {
+        temp_characters[i].id = i;
+      }
+      this.characters = temp_characters;
+      const temp_lightcones = [];
       for (const name in lightcones) {
-        this.lightcones.push({
+        temp_lightcones.push({
           name: name,
           num: lightcones[name],
           rank: rank_map[name],
+          id: 0,
         });
       }
-      this.lightcones.sort((a, b) => {
+      temp_lightcones.sort((a, b) => {
         return b.rank - a.rank;
       });
+      for (const i in temp_lightcones) {
+        temp_lightcones[i].id = i;
+      }
+      this.lightcones = temp_lightcones;
     },
   },
 };
