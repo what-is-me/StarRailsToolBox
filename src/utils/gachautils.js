@@ -3,9 +3,7 @@ import * as path from "path";
 import * as fs from "fs";
 import axios from "axios";
 import { ElMessage } from "element-plus";
-import { ACCOUNT_DIR } from "@/utils/path_config";
-
-const WEB_CACHE_PATH = "StarRail_Data\\webCaches\\Cache\\Cache_Data\\data_2";
+import { ACCOUNT_DIR, WEB_CACHE_PATH } from "@/utils/path_config";
 const sleep = (timeout) => {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -34,6 +32,7 @@ export function cleanGacha(gachaUrl) {
 export function getGachaUrl() {
   const game_path = loadSetting().game_path;
   const web_cache_path = path.join(game_path, WEB_CACHE_PATH);
+  console.log(web_cache_path);
   try {
     const web_cache = fs.readFileSync(web_cache_path, { encoding: "utf-8" });
     //console.log(web_cache);
@@ -43,7 +42,7 @@ export function getGachaUrl() {
     let gachaUrl = gachaUrls[gachaUrls.length - 1][0];
     return gachaUrl;
   } catch (err) {
-    return null;
+    throw "读取缓存失败";
   }
 }
 
@@ -100,7 +99,11 @@ async function getAndSaveRecord(
   gacha_name
 ) {
   const { data } = await axios.get(base_url + param.toString());
-  if (data.data === null) throw "用户信息过期";
+  if (data.data === null) {
+    //const web_cache_path = path.join(loadSetting().game_path, WEB_CACHE_PATH);
+    //fs.rm(web_cache_path, () => {});
+    throw "用户信息过期<br>请尝试打开游戏并查询一两次抽卡记录";
+  }
   const { list } = data.data;
   let last_id = 0;
   for (const record of list) {
@@ -124,27 +127,37 @@ async function getAndSaveRecord(
  */
 export async function saveAll() {
   const setting = loadSetting();
-  let baseUrl = cleanGacha(setting.gacha_url);
+  let baseUrl = null;
   try {
+    if (setting.gacha_url === null || setting.gacha_url === "") {
+      throw new Error("gacha_url is empty");
+    }
+    baseUrl = cleanGacha(setting.gacha_url);
     const { data } = await axios.get(baseUrl + new Param(1).toString());
-    if (data == null) throw "?";
+    if (data.data === null) {
+      console.log("缓存的抽卡网址已过期");
+      throw new Error("gacha_url out of date");
+    }
   } catch (e) {
     baseUrl = getGachaUrl();
+    console.log(baseUrl);
     setting.gacha_url = baseUrl;
     baseUrl = cleanGacha(baseUrl);
     saveSetting(setting);
   }
 
   if (baseUrl === null) {
-    ElMessage.error("无法获取查询网址");
-    return;
+    return new Promise(function (resolve, reject) {
+      reject("无法获取查询网址");
+    });
   }
   for (const { code, name_ch } of GachaTypes) {
     const param = new Param(code);
     const { data } = await axios.get(baseUrl + new Param(1).toString());
     if (data.data === null) {
-      ElMessage.error("用户信息过期");
-      return;
+      return new Promise(function (resolve, reject) {
+        reject("用户信息过期");
+      });
     }
     const { list } = data.data;
     if (list.length === 0) {

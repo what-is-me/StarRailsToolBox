@@ -173,7 +173,6 @@ import { ElMessage } from "element-plus";
 import path from "path";
 import fs from "fs";
 import { ACCOUNT_DIR } from "@/utils/path_config";
-import { More } from "@element-plus/icons-vue";
 import { updateWiki } from "@/utils/wiki";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import GoldenCard from "@/components/GoldenCard.vue";
@@ -183,11 +182,6 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 export default {
   name: "GambleView",
   components: { GoldenCardLarge, GoldenCard },
-  computed: {
-    More() {
-      return More;
-    },
-  },
   data() {
     return {
       tableTitle: "",
@@ -212,10 +206,14 @@ export default {
       this.tableVisible = true;
     },
     saveAll() {
-      saveAll().then(() => {
-        ElMessage({ message: "成功获取所有信息", type: "success" });
-        this.showAll();
-      });
+      saveAll()
+        .then(() => {
+          ElMessage({ message: "成功获取所有信息", type: "success" });
+          this.showAll();
+        })
+        .catch((err) => {
+          ElMessage.error(err);
+        });
     },
     findUids() {
       const data_dir = ACCOUNT_DIR;
