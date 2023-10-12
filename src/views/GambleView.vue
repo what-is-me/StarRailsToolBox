@@ -224,9 +224,6 @@ export default {
         // eslint-disable-next-line no-empty
       } catch (e) {}
     },
-    /**
-     * 正在变成屎山QAQ
-     */
     showAll() {
       const gacha_data = [];
       this.findUids();

@@ -3,7 +3,12 @@ import * as path from "path";
 import * as fs from "fs";
 import axios from "axios";
 import { ElMessage } from "element-plus";
-import { ACCOUNT_DIR, WEB_CACHE_PATH } from "@/utils/path_config";
+import {
+  ACCOUNT_DIR,
+  WEB_CACHE_PATH1,
+  WEB_CACHE_PATH2,
+} from "@/utils/path_config";
+
 const sleep = (timeout) => {
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -26,18 +31,48 @@ export function cleanGacha(gachaUrl) {
 }
 
 /**
+ * Compare versions
+ * @param version1 {string}
+ * @param version2 {string}
+ * @returns {boolean}
+ */
+function versionCmp(version1, version2) {
+  const version1Arr = version1.split(".");
+  const version2Arr = version2.split(".");
+  const minLen = Math.min(version1Arr.length, version2Arr.length);
+  for (let i = 0; i < minLen; i++) {
+    if (Number(version1Arr[i]) < Number(version2Arr[i])) {
+      return true;
+    } else if (Number(version1Arr[i]) > Number(version2Arr[i])) {
+      return false;
+    }
+  }
+  return version1Arr.length < version2Arr.length;
+}
+
+/**
  * 获取查询抽卡记录的url，并删除其中的gacha_type,page,size,end_id参数
  * @returns {string|null} base url of gacha, null if not find
  */
 export function getGachaUrl() {
   const game_path = loadSetting().game_path;
-  const web_cache_path = path.join(game_path, WEB_CACHE_PATH);
+  const web_cache_path1 = path.join(game_path, WEB_CACHE_PATH1);
+  const versions = fs.readdirSync(web_cache_path1);
+  let version = "0.0.0.0";
+  const versionReg = /\d+\.\d+\.\d+\.\d+/;
+  for (const ver of versions) {
+    if (!versionReg.test(ver)) {
+      continue;
+    }
+    if (versionCmp(version, ver)) {
+      version = ver;
+    }
+  }
+  const web_cache_path = path.join(web_cache_path1, version, WEB_CACHE_PATH2);
   console.log(web_cache_path);
   try {
     const web_cache = fs.readFileSync(web_cache_path, { encoding: "utf-8" });
-    //console.log(web_cache);
     const gachaUrls = [...web_cache.matchAll("https://api[!-z]+")];
-    //console.log(gachaUrls);
     if (gachaUrls.length === 0) return null;
     let gachaUrl = gachaUrls[gachaUrls.length - 1][0];
     return gachaUrl;
