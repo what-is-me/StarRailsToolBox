@@ -27,6 +27,7 @@ export function cleanGacha(gachaUrl) {
   gachaUrl = gachaUrl.replaceAll(/&page=\d+/g, "");
   gachaUrl = gachaUrl.replaceAll(/&size=\d+/g, "");
   gachaUrl = gachaUrl.replaceAll(/&end_id=\d+/g, "");
+  gachaUrl = gachaUrl.replaceAll(/&begin_id=\d+/g, "&begin_id=0");
   return gachaUrl;
 }
 
@@ -64,6 +65,7 @@ export function getGachaUrl() {
     if (!versionReg.test(ver)) {
       continue;
     }
+    console.log(ver);
     if (versionCmp(version, ver)) {
       version = ver;
     }
@@ -133,6 +135,7 @@ async function getAndSaveRecord(
   json_path,
   gacha_name
 ) {
+  console.log(base_url + param.toString());
   const { data } = await axios.get(base_url + param.toString());
   if (data.data === null) {
     //const web_cache_path = path.join(loadSetting().game_path, WEB_CACHE_PATH);
@@ -173,6 +176,7 @@ export async function saveAll() {
       console.log("缓存的抽卡网址已过期");
       throw new Error("gacha_url out of date");
     }
+    await sleep(1500);
   } catch (e) {
     baseUrl = getGachaUrl();
     console.log(baseUrl);
@@ -180,7 +184,7 @@ export async function saveAll() {
     baseUrl = cleanGacha(baseUrl);
     saveSetting(setting);
   }
-
+  console.log(setting.gacha_url);
   if (baseUrl === null) {
     return new Promise(function (resolve, reject) {
       reject("无法获取查询网址");
@@ -189,6 +193,7 @@ export async function saveAll() {
   for (const { code, name_ch } of GachaTypes) {
     const param = new Param(code);
     const { data } = await axios.get(baseUrl + new Param(1).toString());
+    console.log(baseUrl + new Param(1).toString(), data);
     if (data.data === null) {
       return new Promise(function (resolve, reject) {
         reject("用户信息过期");
